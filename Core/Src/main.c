@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "iwdg.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -59,7 +60,7 @@ void SystemClock_Config(void);
 uint32_t tick;
 int8_t led_r_status;
 
-
+// define breathing&blinking status variables
 int16_t breatheStrength;
 int8_t breatheDir,blinkStat;
 uint32_t lastTick=0;
@@ -99,11 +100,12 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   // HAL_TIM_Base_Start(&htim2);
-  HAL_TIM_Base_Start_IT(&htim2); //启动TIM中断
-  out();
+  HAL_TIM_Base_Start_IT(&htim2);
+  out();// shut down the light
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -118,7 +120,7 @@ int main(void)
     {}
 
     //breathe&blink;
-    if (led_r_status==1&&tick-lastTick>=BREATHE_INTERVAL)
+    if (led_r_status==1&&tick-lastTick>=BREATHE_INTERVAL) // mode 1
     {
       breatheStrength+=breatheDir*10;
       if (breatheStrength==1000)breatheDir=-1;
@@ -126,7 +128,7 @@ int main(void)
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, breatheStrength);
       lastTick=tick;
     }
-    else if(led_r_status==2&&tick-lastTick>=BLINK_INTERVAL)
+    else if(led_r_status==2&&tick-lastTick>=BLINK_INTERVAL) // mode 2
     {
       if (blinkStat==1)
       {
@@ -178,8 +180,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 6;

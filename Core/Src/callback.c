@@ -1,6 +1,7 @@
 #include "main.h"
 // #include "iwdg.h"
 #include "gpio.h"
+#include "iwdg.h"
 #include "tim.h"
 
 //
@@ -11,6 +12,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == BUT_Pin)
     {
+
         static uint32_t last_key_tick = 0;
         static uint8_t has_last_key_tick = 0;
         uint32_t now = HAL_GetTick();
@@ -18,6 +20,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             has_last_key_tick = 1;
             last_key_tick = now;
+            HAL_IWDG_Refresh(&hiwdg);
             switch (led_r_status)
             {
                 case 0:breathe();break;
