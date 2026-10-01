@@ -1,5 +1,5 @@
 #include "main.h"
-#include "iwdg.h"
+// #include "iwdg.h"
 #include "gpio.h"
 #include "tim.h"
 
@@ -18,7 +18,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             has_last_key_tick = 1;
             last_key_tick = now;
-            HAL_IWDG_Refresh(&hiwdg);//watchdog refreshes
+            switch (led_r_status)
+            {
+                case 0:led_r_status=1;breathe();break;
+                case 1:led_r_status=2;blink();break;
+                case 2:led_r_status=0;out();break;
+                default:break;
+            }
+            // HAL_IWDG_Refresh(&hiwdg);//watchdog refreshes
         }
     }
 }

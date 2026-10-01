@@ -41,12 +41,14 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+extern int8_t led_r_status;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+void breathe(void);
+void blink(void);
+void out(void);
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

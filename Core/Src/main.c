@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "iwdg.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -57,7 +56,17 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint32_t tick;
+int8_t led_r_status;
 
+void breathe()
+{
+
+}
+void out(){__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);}
+void blink()
+{
+
+}
 /* USER CODE END 0 */
 
 /**
@@ -90,14 +99,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM1_Init();
-  MX_TIM12_Init();
-  MX_IWDG_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   // HAL_TIM_Base_Start(&htim2);
   HAL_TIM_Base_Start_IT(&htim2); //启动TIM中断
-
+  out();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -151,9 +158,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 6;
