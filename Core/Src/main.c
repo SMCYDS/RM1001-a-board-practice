@@ -33,7 +33,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define BREATHE_INTERVAL 10
+#define BLINK_INTERVAL 500
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,15 +59,13 @@ void SystemClock_Config(void);
 uint32_t tick;
 int8_t led_r_status;
 
-void breathe()
-{
 
-}
-void out(){__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);}
-void blink()
-{
-
-}
+int16_t breatheStrength;
+int8_t breatheDir,blinkStat;
+uint32_t lastTick=0;
+void breathe(){led_r_status=1;lastTick=tick;breatheStrength=0;breatheDir=1;}
+void blink(){led_r_status=2;lastTick=tick;__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);blinkStat=0;}
+void out(){led_r_status=0;__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);}
 /* USER CODE END 0 */
 
 /**
@@ -109,16 +108,37 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
 
     tick=HAL_GetTick();
 
     if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == GPIO_PIN_SET) // custom button
+    {}
+
+    //breathe&blink;
+    if (led_r_status==1&&tick-lastTick>=BREATHE_INTERVAL)
     {
-
+      breatheStrength+=breatheDir*10;
+      if (breatheStrength==1000)breatheDir=-1;
+      else if (!breatheStrength)breatheDir=1;
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, breatheStrength);
+      lastTick=tick;
     }
-
+    else if(led_r_status==2&&tick-lastTick>=BLINK_INTERVAL)
+    {
+      if (blinkStat==1)
+      {
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
+        blinkStat=0;
+      }else
+      {
+        __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 500);
+        blinkStat=1;
+      }
+      lastTick=tick;
+    }
 
     //wavelight
     int CYC=5000,HCYC=CYC/2;
